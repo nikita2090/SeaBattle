@@ -16,14 +16,12 @@ export default class Board extends Component {
 
     divideToRows(arr) {
         let rows = [];
-        for (let i = 0; i < 100; i++) {
-            if (isInteger(i / 10)) {
-                let arrRow = arr.slice(i, i + 10);
-                let row = arrRow.map((_, j) =>
-                    this.renderSquare(j + i)
-                );
-                rows.push(row);
-            }
+        for (let i = 0; i < 100; i += 10) {
+            let arrRow = arr.slice(i, i + 10);
+            let row = arrRow.map((_, j) =>
+                this.renderSquare(j + i)
+            );
+            rows.push(row);
         }
         return rows;
     }
@@ -52,8 +50,4 @@ export default class Board extends Component {
             </table>
         )
     }
-}
-
-function isInteger(num) {
-    return (num ^ 0) === num;
 }

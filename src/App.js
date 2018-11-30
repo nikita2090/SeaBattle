@@ -16,6 +16,7 @@ class App extends Component {
                 cruiser: [3, 3],
                 battleship: [4]
             },
+            enemySquares: new Array(100).fill(false)
         };
         this.buildedShipNumbers = [];
         this.reservedSquares = [];
@@ -29,51 +30,48 @@ class App extends Component {
         let newSquares = this.state.squares.slice(); //make a copy of our state.squares
 
         if (!this.availableVals) return;
-        for (let val of this.availableVals) {
-            if (val === i) {
-                let newPoints = Object.assign({}, this.state.freePoints); //make a copy of our state.freePoints
-                let currentShipBuildingPoints = newPoints[this.currentShip];
-                let points = currentShipBuildingPoints[currentShipBuildingPoints.length - 1];
+        if (this.availableVals.includes(i)) {
+            let newPoints = Object.assign({}, this.state.freePoints); //make a copy of our state.freePoints
+            let currentShipBuildingPoints = newPoints[this.currentShip];
+            let points = currentShipBuildingPoints[currentShipBuildingPoints.length - 1];
 
-                newSquares[i] = true;
-                this.buildedShipNumbers.push(i);
+            newSquares[i] = true;
+            this.buildedShipNumbers.push(i);
 
-                let availableVals = calculateAvailableValues(this.buildedShipNumbers);
-                this.availableVals = availableVals.filter(elem => !this.reservedSquares.includes(elem));
+            let availableVals = calculateAvailableValues(this.buildedShipNumbers);
+            this.availableVals = availableVals.filter(elem => !this.reservedSquares.includes(elem));
 
-                this.setState({
-                    squares: newSquares
-                });
+            this.setState({
+                squares: newSquares
+            });
 
-                points--;
-                currentShipBuildingPoints.pop();
-                if (points < 1) {
-                    if (Math.max(this.state.freePoints.vedette) < 1) {
-                        setTimeout(() => {
-                            alert('Ships are ready!');
-                        }, 0);
-                        this.availableVals = null;
-                        return;
-                    }
-
-                    let halo = calculateHalo(this.buildedShipNumbers); //calculate halo around the builded ship
-                    this.reservedSquares = this.reservedSquares.concat(this.buildedShipNumbers, halo);//new set?
-
-                    this.buildedShipNumbers = [];
-                    let newArr = Array.from(Array(100).keys()); //arr with 100 numbered elems
-                    this.availableVals = newArr.filter(elem => !this.reservedSquares.includes(elem));
-
-                    if (currentShipBuildingPoints.length === 0) {
-                        this.shipKey--;
-                        this.currentShip = this.ships[this.shipKey];
-                    }
-                } else {
-                    currentShipBuildingPoints.push(points);
-                    this.setState({
-                        freePoints: newPoints
-                    });
+            points--;
+            currentShipBuildingPoints.pop();
+            if (points < 1) {
+                if (Math.max(this.state.freePoints.vedette) < 1) {
+                    setTimeout(() => {
+                        alert('Ships are ready!');
+                    }, 0);
+                    this.availableVals = null;
+                    return;
                 }
-                break;
+
+                let halo = calculateHalo(this.buildedShipNumbers); //calculate halo around the builded ship
+                this.reservedSquares = this.reservedSquares.concat(this.buildedShipNumbers, halo);//new set?
+
+                this.buildedShipNumbers = [];
+                let newArr = Array.from(Array(100).keys()); //arr with 100 numbered elems
+                this.availableVals = newArr.filter(elem => !this.reservedSquares.includes(elem));
+
+                if (currentShipBuildingPoints.length === 0) {
+                    this.shipKey--;
+                    this.currentShip = this.ships[this.shipKey];
+                }
+            } else {
+                currentShipBuildingPoints.push(points);
+                this.setState({
+                    freePoints: newPoints
+                });
             }
         }
     };
@@ -87,11 +85,15 @@ class App extends Component {
                 squares={this.state.squares}
                 onClick={(i) => this.handleClick(i)}
                 reserved={this.reservedSquares}/>
+            <Board
+                squares={this.state.enemySquares}
+                reserved={this.reservedSquares}/>
+            />
             </>
+
         )
     }
 }
-
 
 function calculateAvailableValues(arrOfClickedElems) {
     let minVal = Math.min(...arrOfClickedElems);
