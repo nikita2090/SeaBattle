@@ -10,10 +10,10 @@ function calculateAvailableValues(arrOfClickedElems) {
         result = [minVal - 10, minVal + 10];
         if (!checkLeftBorder(minVal)) result = result.concat([minVal - 1]);
         if (!checkRightBorder(minVal)) result = result.concat([minVal + 1]);
-    } else if (dif === 1 || dif === 2) {
+    } else if (dif === 1 || dif === 2 || dif === 3) {
         if (!checkLeftBorder(minVal)) result = result.concat([minVal - 1]);
         if (!checkRightBorder(maxVal)) result = result.concat([maxVal + 1]);
-    } else if (dif === 10 || dif === 20) {
+    } else if (dif === 10 || dif === 20 || dif === 30) {
         minVal = minVal - 10;
         maxVal = maxVal + 10;
         result = [minVal, maxVal];

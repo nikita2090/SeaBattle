@@ -11,8 +11,12 @@ function addEnemyFunctional(WrappedBoard) {
             this.props.build();
         }
 
-        handleClick = (i) => {
+        componentDidUpdate() {
+            this.props.turn();
+        }
 
+        handleClick = (i) => {
+            this.props.forEnemyBoardClick(i);
         };
 
         render(){

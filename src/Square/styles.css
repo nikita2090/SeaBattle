@@ -11,5 +11,14 @@
 
 .boat{
     background: darkblue;
-    color:white;
+    color: white;
+}
+
+.killed{
+    background: darkred;
+    color: white;
+}
+
+.miss{
+    background: gray;
 }
