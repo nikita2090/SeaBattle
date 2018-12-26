@@ -17,9 +17,9 @@ class App extends Component {
                 cruiser: [3, 3],
                 battleship: [4]
             },
-            playerTurn: true
+            playerTurn: null,
+
         };
-        this.playerTurn = true;
 
         this.player = {
             builtShipNumbers: [],
@@ -41,6 +41,10 @@ class App extends Component {
             builtShipNumbers: [],
             reservedSquares: [],
             availableVals: Array.from(new Array(100).keys()),
+
+            currentShipForKill: [],
+            alreadyShot: [],
+            squaresForShot: Array.from(new Array(100).keys())
         };
         this.enemy.ships = Object.getOwnPropertyNames(this.enemy.freePoints);
         this.enemy.shipKey = this.enemy.ships.length - 1;
@@ -78,7 +82,6 @@ class App extends Component {
         let currentShipBuildingPointsArr = newPoints[target.currentShip];
         let points = currentShipBuildingPointsArr[currentShipBuildingPointsArr.length - 1];
 
-
         let vedettsAmount;
         if (playerFlag) {
             vedettsAmount = this.state.playerFreePoints.vedette
@@ -87,10 +90,45 @@ class App extends Component {
         }
 
         target.builtShipNumbers.push(index);
+        //console.log('target.builtShipNumbers' + target.builtShipNumbers);
+        //console.log('target.builtShipNumbersLASTelem' + target.builtShipNumbers[target.builtShipNumbers.length - 1]);
+
         let availableVals = calculateAvailableValues(target.builtShipNumbers);
+        console.log('availableVals:' + availableVals);
         target.availableVals = availableVals.filter(elem => !target.reservedSquares.includes(elem));
+
+        //console.log('reservedSquares:' + target.reservedSquares);
+        //console.log('availableValsFilter:' + target.availableVals);
+
         if (!playerFlag && !target.availableVals.length && target.builtShipNumbers.length > 0 && !(target.builtShipNumbers[target.builtShipNumbers.length - 1])) {
-            alert('EnemyBoard BUG');
+            //console.log('BBBBBBBBUUUUUUUUUUUUUUUUUUUUUGGGGGGGGGGGG');
+            /*target.builtShipNumbers.pop();
+            if (target.builtShipNumbers.length < 1) {
+                let newArr = Array.from(new Array(100).keys()); //arr with 100 numbered elems
+                target.availableVals = newArr.filter(elem => !target.reservedSquares.includes(elem));
+            } else {
+                availableVals = calculateAvailableValues(target.builtShipNumbers);
+                target.availableVals = availableVals.filter(elem => !target.reservedSquares.includes(elem));
+            }
+            newSquares[index] = true;
+            if (playerFlag) {
+                this.setState({
+                    playerSquares: newSquares
+                });
+            } else {
+                this.enemy.squares = newSquares;
+            }*/
+            /*let newArr = Array.from(new Array(100).keys()); //arr with 100 numbered elems
+            target.availableVals = newArr.filter(elem => !target.reservedSquares.includes(elem));
+            console.log('BUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUG');
+            if (!playerFlag) {
+                this.setState({
+                    enemySquares: this.enemy.squares
+                });
+            }*/
+            //return;
+
+            alert('EnemyBoard BUG. Rebuilding!');
             this.setState({
                 enemySquares: new Array(100).fill('empty'),
             });
@@ -106,6 +144,10 @@ class App extends Component {
                 builtShipNumbers: [],
                 reservedSquares: [],
                 availableVals: Array.from(new Array(100).keys()),
+
+                currentShipForKill: [],
+                alreadyShot: [],
+                squaresForShot: Array.from(new Array(100).keys())
             };
             this.enemy.ships = Object.getOwnPropertyNames(this.enemy.freePoints);
             this.enemy.shipKey = this.enemy.ships.length - 1;
@@ -125,13 +167,17 @@ class App extends Component {
         points--;
         currentShipBuildingPointsArr.pop();
         if (points < 1) {
+            //console.log('points<1');
             if (Math.max(...vedettsAmount) < 1) {
                 if (!playerFlag) {
                     this.setState({
                         enemySquares: this.enemy.squares
                     });
+                } else {
+                    this.setState({
+                        playerTurn: true
+                    });
                 }
-                //target.availableVals = null;
                 return;
             }
 
@@ -141,13 +187,13 @@ class App extends Component {
             target.builtShipNumbers = [];
             let newArr = Array.from(new Array(100).keys()); //arr with 100 numbered elems
             target.availableVals = newArr.filter(elem => !target.reservedSquares.includes(elem));
+            //console.log('av:' + target.availableVals);
             if (currentShipBuildingPointsArr.length === 0) {
                 target.shipKey--;
                 target.currentShip = target.ships[target.shipKey];
             }
         } else {
             currentShipBuildingPointsArr.push(points);
-
             if (playerFlag) {
                 this.setState({
                     freePoints: newPoints
@@ -160,35 +206,67 @@ class App extends Component {
 
     forEnemyBoardClick = (index) => {
         let newEnemySquares = this.state.enemySquares.slice();
-        if (this.state.playerTurn && this.state.enemySquares[index] === 'boat') {
-            newEnemySquares[index] = 'killed';
-            this.setState({
-                enemySquares: newEnemySquares
-            });
-        } else if (this.state.enemySquares[index] === 'empty') {
-            newEnemySquares[index] = 'miss';
-            this.playerTurn = false;
-            this.setState({
-                enemySquares: newEnemySquares,
-                playerTurn: this.playerTurn
-            });
+        if (this.state.playerTurn) {
+            if (newEnemySquares[index] === 'boat') {
+                newEnemySquares[index] = 'killed';
+                this.setState({
+                    enemySquares: newEnemySquares
+                });
+                //console.log(this.state.playerTurn);
+            } else if (newEnemySquares[index] === 'empty') {
+                newEnemySquares[index] = 'miss';
+
+                this.setState({
+                    enemySquares: newEnemySquares,
+                    playerTurn: false
+                });
+            }
         }
     };
 
     letEnemyTurn = () => {
-        let newPlayerSquares = this.state.playerSquares.slice();
-        while (!this.playerTurn) {
-            let rand = Math.floor(Math.random() * this.state.playerSquares.length);
-            if (newPlayerSquares[rand] === 'boat') {
-                newPlayerSquares[rand] = 'killed';
-            } else if (newPlayerSquares[rand] === 'empty') {
-                newPlayerSquares[rand] = 'miss';
-                this.playerTurn = true;
-            }
+        let newPlayerTurn = this.state.playerTurn;
+        let newSquares = this.state.playerSquares.slice();
+        let candidatesForKill, isShipKilled;
+        while (newPlayerTurn === false) {
+            let rand = Math.floor(Math.random() * this.enemy.squaresForShot.length);
+            console.log(rand);
 
+            let randomSquareForShot = this.enemy.squaresForShot[rand];
+            console.log(randomSquareForShot);
+
+            if (newSquares[randomSquareForShot] === 'boat') {
+                newSquares[randomSquareForShot] = 'killed';
+                console.log('killed');
+
+                this.enemy.currentShipForKill.push(randomSquareForShot);
+                candidatesForKill = calculateAvailableValues(this.enemy.currentShipForKill);
+                isShipKilled = !candidatesForKill.some(square => newSquares[square] === 'boat');
+                this.enemy.alreadyShot.push(randomSquareForShot);
+                if (isShipKilled) {
+                    let halo = calculateHalo(this.enemy.currentShipForKill);
+                    this.enemy.alreadyShot = this.enemy.alreadyShot.concat(halo);
+                    halo.forEach(square => {
+                        newSquares[square] = 'miss';
+                    });
+                    this.enemy.squaresForShot = Array.from(new Array(100).keys());
+                    this.enemy.currentShipForKill = [];
+                } else {
+                    this.enemy.squaresForShot = candidatesForKill;
+                }
+            } else if (newSquares[randomSquareForShot] === 'empty') {
+                this.enemy.alreadyShot.push(randomSquareForShot);
+                if (this.enemy.currentShipForKill.length < 1) {
+                    this.enemy.squaresForShot = Array.from(new Array(100).keys());
+                }
+                console.log('miss');
+                newSquares[randomSquareForShot] = 'miss';
+                newPlayerTurn = true;
+            }
+            this.enemy.squaresForShot = this.enemy.squaresForShot.filter(elem => !this.enemy.alreadyShot.includes(elem));
             this.setState({
-                playerTurn: this.playerTurn,
-                playerSquares: newPlayerSquares
+                playerTurn: newPlayerTurn,
+                playerSquares: newSquares
             });
         }
     };

@@ -30,12 +30,24 @@ function calculateHalo(arr) {
     if (!checkRightBorder(minVal)) result = result.concat([minVal + 1, minVal + 11, minVal - 9]);
 
     let dif = maxVal - minVal;
-    if (dif === 1 || dif === 2 || dif === 3 || dif === 10 || dif === 20 || dif === 30) {
+    //if (dif === 1 || dif === 2 || dif === 3 || dif === 10 || dif === 20 || dif === 30) {
+    if (dif <= 30) {
         result = result.concat([maxVal - 10, maxVal + 10]);
         if (!checkLeftBorder(maxVal)) result = result.concat([maxVal - 1, maxVal - 11, maxVal + 9]);
         if (!checkRightBorder(maxVal)) result = result.concat([maxVal + 1, maxVal + 11, maxVal - 9]);
     }
-    return result.filter((elem) => elem >= 0 && elem < 100);
+
+    if (dif > 0 && dif <= 3) {
+        result = result.filter(elem => elem !== maxVal - 1 && elem !== minVal + 1);
+    }
+
+    if (dif >= 10 && dif <= 30) {
+        result = result.filter(elem => elem !== maxVal - 10 && elem !== minVal + 10);
+    }
+
+    result = result.filter(elem => elem >= 0 && elem < 100);
+    result = result.filter((item, pos) => result.indexOf(item) === pos);
+    return result;
 }
 
 function checkLeftBorder(value) {

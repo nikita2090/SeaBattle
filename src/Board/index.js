@@ -10,6 +10,7 @@ export default class Board extends Component {
                 value={this.props.squares[i]}
                 onClick={() => this.props.onClick(i)}
                 number={i}
+                enemy={this.props.enemy}
             />
         )
     };

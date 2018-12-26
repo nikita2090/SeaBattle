@@ -25,6 +25,7 @@ function addEnemyFunctional(WrappedBoard) {
                     squares={this.props.squares}
                     onClick={(i) => this.handleClick(i)}
                     {...this.props}
+                    enemy={true}
                 />
             )
         }

@@ -3,11 +3,12 @@ import './styles.css';
 
 export default class Square extends Component {
     render() {
-        function calculateClass(value) {
-            switch(value){
+        function calculateClass(value, enemy) {
+            switch (value) {
                 case 'empty':
                     return 'square';
                 case 'boat':
+                    if (enemy) return 'square';
                     return 'square boat';
                 case 'killed':
                     return 'square killed';
@@ -15,11 +16,12 @@ export default class Square extends Component {
                     return 'square miss'
             }
         }
+
         return (
             <td
-                className={calculateClass(this.props.value)}
+                className={calculateClass(this.props.value, this.props.enemy)}
                 onClick={this.props.onClick}>
-                    {this.props.number}
+                {this.props.number}
             </td>
         )
     }
