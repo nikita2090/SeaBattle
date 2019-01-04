@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import Board from '../Board';
-import Tooltip from '../Tooltip';
 
 const PlayerBd = addPlayerFunctional(Board);
 
@@ -14,13 +13,10 @@ function addPlayerFunctional(WrappedBoard) {
 
         render(){
             return (
-                <>
-                <Tooltip value={this.props.freePoints}/>
                 <WrappedBoard
                     squares={this.props.squares}
                     onClick={(i) => this.handleClick(i)}
                     {...this.props}/>
-                </>
             )
         }
     }

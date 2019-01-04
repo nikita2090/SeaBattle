@@ -8,6 +8,7 @@ export default function Tooltip(props) {
     let shipSizes = [1, 2, 3, 4];
     let availableShipsAmount = shipPoints[currentShip].length;
     let allShipsBuilt = false;
+    let winner = props.winner;
 
     for (let points in shipPoints) {
         if (availableShipsAmount === 0) {
@@ -23,9 +24,15 @@ export default function Tooltip(props) {
         }
     }
 
+    if (winner) {
+        return (
+            <div>
+                {winner} wins!
+            </div>)
+    }
 
     if (allShipsBuilt) {
-        return(
+        return (
             <div>
                 <div>Now you can play!</div>
                 <div>Your turn!</div>
@@ -34,7 +41,7 @@ export default function Tooltip(props) {
         return (
             <div>
                 <div>
-                    Click on {shipSizes[current]} {shipSizes[current] >1 ? 'adjacent' : ''} square{shipSizes[current] > 1 ? 's' : ''} to
+                    Click on {shipSizes[current]} {shipSizes[current] > 1 ? 'adjacent' : ''} square{shipSizes[current] > 1 ? 's' : ''} to
                     build {currentShip}.
                 </div>
 

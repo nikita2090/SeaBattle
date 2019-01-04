@@ -13,7 +13,8 @@ export default class Square extends Component {
                 case 'killed':
                     return 'square killed';
                 case 'miss':
-                    return 'square miss'
+                    return 'square miss';
+                default:
             }
         }
 
