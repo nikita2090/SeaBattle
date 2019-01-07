@@ -3,7 +3,7 @@ import './App.css';
 import PlayerBoard from './PlayerBoard';
 import EnemyBoard from './EnemyBoard';
 import Header from './Header';
-import {calculateAvailableValues, calculateHalo, calculateAdjacentSquares} from './functions';
+import {calculateAvailableValues, calculateHalo} from './functions';
 import Tooltip from "./Tooltip/index";
 
 class App extends Component {
@@ -21,7 +21,6 @@ class App extends Component {
             playerTurn: null,
             winner: null
         };
-
         this.resetGameProperties();
     }
 
@@ -32,8 +31,6 @@ class App extends Component {
             availableVals: Array.from(new Array(100).keys()),
             builtShips: [],
             ships: Object.getOwnPropertyNames(this.state.playerFreePoints),
-            currentShipForKill: [],
-            candidatesForKill: []
         };
         this.player.shipKey = this.player.ships.length - 1;
         this.player.currentShip = this.player.ships[this.player.shipKey];
@@ -49,8 +46,13 @@ class App extends Component {
             currentShipForBuild: [],
             reservedSquares: [],
             availableVals: Array.from(new Array(100).keys()),
-            builtShips: [],
-
+            builtShips: {
+                vedette: [],
+                destroyer: [],
+                cruiser: [],
+                battleship: []
+            },
+            builtShipsCopy: {},
             currentShipForKill: [],
             alreadyShot: [],
             squaresForShot: Array.from(new Array(100).keys())
@@ -125,33 +127,6 @@ class App extends Component {
         target.availableVals = availableVals.filter(elem => !target.reservedSquares.includes(elem));
 
         if (!playerFlag && !target.availableVals.length && target.currentShipForBuild.length > 0 && !(target.currentShipForBuild[target.currentShipForBuild.length - 1])) {
-            //console.log('BBBBBBBBUUUUUUUUUUUUUUUUUUUUUGGGGGGGGGGGG');
-            /*target.currentShipForBuild.pop();
-            if (target.currentShipForBuild.length < 1) {
-                let newArr = Array.from(new Array(100).keys()); //arr with 100 numbered elems
-                target.availableVals = newArr.filter(elem => !target.reservedSquares.includes(elem));
-            } else {
-                availableVals = calculateAvailableValues(target.currentShipForBuild);
-                target.availableVals = availableVals.filter(elem => !target.reservedSquares.includes(elem));
-            }
-            newSquares[index] = true;
-            if (playerFlag) {
-                this.setState({
-                    playerSquares: newSquares
-                });
-            } else {
-                this.enemy.squares = newSquares;
-            }*/
-            /*let newArr = Array.from(new Array(100).keys()); //arr with 100 numbered elems
-            target.availableVals = newArr.filter(elem => !target.reservedSquares.includes(elem));
-            console.log('BUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUG');
-            if (!playerFlag) {
-                this.setState({
-                    enemySquares: this.enemy.squares
-                });
-            }*/
-            //return;
-
             alert('EnemyBoard BUG. Rebuilding!');
             this.setState({
                 enemySquares: new Array(100).fill('empty'),
@@ -174,7 +149,13 @@ class App extends Component {
         if (points < 1) {
             let halo = calculateHalo(target.currentShipForBuild); //calculate halo around the builded ship
             target.reservedSquares = target.reservedSquares.concat(target.currentShipForBuild, halo);//new set?
-            target.builtShips = target.builtShips.concat(target.currentShipForBuild);
+
+            if (playerFlag) {
+                target.builtShips = target.builtShips.concat(target.currentShipForBuild);
+            } else {
+                target.builtShips[target.currentShip].push(target.currentShipForBuild);
+                target.builtShipsCopy = JSON.parse(JSON.stringify(target.builtShips));
+            }
 
             if (Math.max(...vedettsAmount) < 1) {
                 if (!playerFlag) {
@@ -215,32 +196,40 @@ class App extends Component {
         if (this.state.playerTurn) {
             if (newEnemySquares[index] === 'boat') {
                 newEnemySquares[index] = 'killed';
-                let elemNumber = this.enemy.builtShips.indexOf(newEnemySquares[index]);
-                this.enemy.builtShips.splice(elemNumber, 1);
-                if (this.enemy.builtShips.length < 1){
+
+                let aliveShipsAmount = 10;
+                for (let kindOfShip in this.enemy.builtShips) {
+                    if (this.enemy.builtShips.hasOwnProperty(kindOfShip)) {
+                        let currentShipKindArr = this.enemy.builtShips[kindOfShip];
+                        currentShipKindArr.forEach(arr => {
+                            arr.forEach(elem => {
+                                if (elem === index) {
+                                    let elemNumber = arr.indexOf(elem);
+                                    arr.splice(elemNumber, 1);
+                                }
+                            });
+
+                            if (arr.length < 1) {
+                                let arrNumber = currentShipKindArr.indexOf(arr);
+                                let halo = calculateHalo(this.enemy.builtShipsCopy[kindOfShip][arrNumber]);
+                                halo.forEach(square => {
+                                    newEnemySquares[square] = 'miss';
+                                });
+                                aliveShipsAmount--;
+                            }
+                        });
+                    }
+                }
+
+                this.setState({
+                    enemySquares: newEnemySquares
+                });
+
+                if (!aliveShipsAmount) {
                     this.setState({
                         winner: 'Player'
                     });
                 }
-
-                this.player.currentShipForKill.push(index);
-
-                let adjacentSqures = calculateAdjacentSquares(index);
-                this.player.candidatesForKill = this.player.candidatesForKill.concat(adjacentSqures);
-
-                let isShipKilled = !this.player.candidatesForKill.some(square => newEnemySquares[square] === 'boat');
-
-                if (isShipKilled) {
-                    let halo = calculateHalo(this.player.currentShipForKill);
-                    halo.forEach(square => {
-                        newEnemySquares[square] = 'miss';
-                    });
-                    this.player.candidatesForKill = [];
-                    this.player.currentShipForKill = [];
-                }
-                this.setState({
-                    enemySquares: newEnemySquares
-                });
             } else if (newEnemySquares[index] === 'empty') {
                 newEnemySquares[index] = 'miss';
                 this.setState({
@@ -255,8 +244,9 @@ class App extends Component {
         if (this.state.winner) return;
         let newPlayerTurn = this.state.playerTurn;
         let newSquares = this.state.playerSquares.slice();
+        let winner = this.state.winner;
         let candidatesForKill, isShipKilled;
-        while (!this.state.winner && newPlayerTurn === false) {
+        while (!winner && newPlayerTurn === false) {
             let rand = Math.floor(Math.random() * this.enemy.squaresForShot.length);
             let randomSquareForShot = this.enemy.squaresForShot[rand];
 
@@ -265,16 +255,18 @@ class App extends Component {
 
                 let elemNumber = this.player.builtShips.indexOf(newSquares[randomSquareForShot]);
                 this.player.builtShips.splice(elemNumber, 1);
-                if (this.player.builtShips.length < 1){
+
+                if (this.player.builtShips.length < 1) {
+                    winner = 'Enemy';
                     this.setState({
-                        winner: 'Enemy'
+                        winner: winner
                     });
                 }
-
                 this.enemy.currentShipForKill.push(randomSquareForShot);
                 candidatesForKill = calculateAvailableValues(this.enemy.currentShipForKill);
                 isShipKilled = !candidatesForKill.some(square => newSquares[square] === 'boat');
                 this.enemy.alreadyShot.push(randomSquareForShot);
+
                 if (isShipKilled) {
                     let halo = calculateHalo(this.enemy.currentShipForKill);
                     this.enemy.alreadyShot = this.enemy.alreadyShot.concat(halo);
@@ -327,4 +319,3 @@ class App extends Component {
 }
 
 export default App;
-
