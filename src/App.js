@@ -91,16 +91,24 @@ class App extends Component {
     };
 
     buildEnemyShips = () => {
-        while (this.enemy.freePoints.vedette.length > 0) {
+        while (this.enemy.freePoints.vedette.length) {
             let rand = Math.floor(Math.random() * this.enemy.availableVals.length);
+            console.log('random value:' + rand);
+
             let randomAvaliableValue = this.enemy.availableVals[rand];
+            if(isNaN(randomAvaliableValue)){
+                alert('EnemyBoard BUG. Rebuilding!');
+                this.startNewGame();
+                return;
+            }
+            console.log('random avaliable value:' + randomAvaliableValue);
+
             this.build(randomAvaliableValue, false);
         }
     };
 
     build = (index, playerFlag) => {
         let target, newSquares, newPoints;
-
         if (playerFlag) {
             target = this.player;
             newSquares = this.state.playerSquares.slice();
@@ -118,7 +126,7 @@ class App extends Component {
         if (playerFlag) {
             vedettsAmount = this.state.playerFreePoints.vedette
         } else {
-            vedettsAmount = target.freePoints.vedette
+            vedettsAmount = this.enemy.freePoints.vedette
         }
 
         target.currentShipForBuild.push(index);
@@ -126,16 +134,8 @@ class App extends Component {
         let availableVals = calculateAvailableValues(target.currentShipForBuild);
         target.availableVals = availableVals.filter(elem => !target.reservedSquares.includes(elem));
 
-        if (!playerFlag && !target.availableVals.length && target.currentShipForBuild.length > 0 && !(target.currentShipForBuild[target.currentShipForBuild.length - 1])) {
-            alert('EnemyBoard BUG. Rebuilding!');
-            this.setState({
-                enemySquares: new Array(100).fill('empty'),
-            });
-            this.resetGameProperties();
-            return;
-        }
-
         newSquares[index] = 'boat';
+
         if (playerFlag) {
             this.setState({
                 playerSquares: newSquares
