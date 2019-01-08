@@ -62,7 +62,7 @@ class App extends Component {
         this.enemy.currentShip = this.enemy.ships[this.enemy.shipKey];
     };
 
-    resetGameStates = () => {
+    startNewGame = () => {
         this.setState({
             playerSquares: new Array(100).fill('empty'),
             enemySquares: new Array(100).fill('empty'),
@@ -74,17 +74,20 @@ class App extends Component {
             },
             playerTurn: null,
             winner: null
+        }, () =>{
+            this.resetGameProperties();
+            this.buildEnemyShips();
         });
-    };
-
-    startNewGame = () => {
-        this.resetGameProperties();
-        this.resetGameStates();
-        this.buildEnemyShips();
     };
 
     buildPlayerShips = (index) => {
         if (!this.player.availableVals) return;
+
+        if (this.player.availableVals.length === 0) {
+            alert('Your ship building deadlocked. Your board will be cleaned!');
+            this.startNewGame();
+        }
+
         if (this.player.availableVals.includes(index)) {
             this.build(index, true);
         }
@@ -93,15 +96,13 @@ class App extends Component {
     buildEnemyShips = () => {
         while (this.enemy.freePoints.vedette.length) {
             let rand = Math.floor(Math.random() * this.enemy.availableVals.length);
-            console.log('random value:' + rand);
-
             let randomAvaliableValue = this.enemy.availableVals[rand];
-            if(isNaN(randomAvaliableValue)){
-                alert('EnemyBoard BUG. Rebuilding!');
+
+            if (isNaN(randomAvaliableValue)) {
+                alert('EnemyBoard deadlock. Rebuilding!');
                 this.startNewGame();
                 return;
             }
-            console.log('random avaliable value:' + randomAvaliableValue);
 
             this.build(randomAvaliableValue, false);
         }
@@ -122,13 +123,6 @@ class App extends Component {
         let currentShipBuildingPointsArr = newPoints[target.currentShip];
         let points = currentShipBuildingPointsArr[currentShipBuildingPointsArr.length - 1];
 
-        let vedettsAmount;
-        if (playerFlag) {
-            vedettsAmount = this.state.playerFreePoints.vedette
-        } else {
-            vedettsAmount = this.enemy.freePoints.vedette
-        }
-
         target.currentShipForBuild.push(index);
 
         let availableVals = calculateAvailableValues(target.currentShipForBuild);
@@ -147,33 +141,40 @@ class App extends Component {
         points--;
         currentShipBuildingPointsArr.pop();
         if (points < 1) {
-            let halo = calculateHalo(target.currentShipForBuild); //calculate halo around the builded ship
-            target.reservedSquares = target.reservedSquares.concat(target.currentShipForBuild, halo);//new set?
+            let halo = calculateHalo(target.currentShipForBuild);
+            target.reservedSquares = target.reservedSquares.concat(target.currentShipForBuild, halo);
+
+            let vedettsAmount;
 
             if (playerFlag) {
                 target.builtShips = target.builtShips.concat(target.currentShipForBuild);
+                vedettsAmount = this.state.playerFreePoints.vedette
             } else {
                 target.builtShips[target.currentShip].push(target.currentShipForBuild);
                 target.builtShipsCopy = JSON.parse(JSON.stringify(target.builtShips));
+                vedettsAmount = this.enemy.freePoints.vedette
             }
 
             if (Math.max(...vedettsAmount) < 1) {
-                if (!playerFlag) {
-                    this.setState({
-                        enemySquares: this.enemy.squares
-                    });
-                } else {
+                if (playerFlag) {
                     this.player.availableVals = null;
                     this.setState({
                         playerTurn: true
+                    });
+                } else {
+
+
+                    this.setState({
+                        enemySquares: this.enemy.squares
                     });
                 }
                 return;
             }
 
             target.currentShipForBuild = [];
-            let newArr = Array.from(new Array(100).keys()); //arr with 100 numbered elems
+            let newArr = Array.from(new Array(100).keys());
             target.availableVals = newArr.filter(elem => !target.reservedSquares.includes(elem));
+
             if (currentShipBuildingPointsArr.length === 0) {
                 target.shipKey--;
                 target.currentShip = target.ships[target.shipKey];
@@ -300,8 +301,7 @@ class App extends Component {
             <Header/>
             <Tooltip
                 value={this.state.playerFreePoints}
-                winner={this.state.winner}
-            />
+                winner={this.state.winner}/>
             <button onClick={this.startNewGame}>New Game</button>
             <PlayerBoard
                 squares={this.state.playerSquares}
