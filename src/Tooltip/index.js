@@ -1,29 +1,7 @@
 import React from 'react';
 
 export default function Tooltip(props) {
-    let shipPoints = props.value;
-    let shipNames = Object.keys(props.value);
-    let current = shipNames.length - 1;
-    let currentShip = shipNames[current];
-    let shipSizes = [1, 2, 3, 4];
-    let availableShipsAmount = shipPoints[currentShip].length;
-    let allShipsBuilt = false;
     let winner = props.winner;
-
-    for (let points in shipPoints) {
-        if (availableShipsAmount === 0) {
-            current--;
-            if (current < 0) {
-                allShipsBuilt = true;
-                break;
-            }
-            else {
-                currentShip = shipNames[current];
-                availableShipsAmount = shipPoints[currentShip].length;
-            }
-        }
-    }
-
     if (winner) {
         return (
             <div>
@@ -31,24 +9,39 @@ export default function Tooltip(props) {
             </div>)
     }
 
-    if (allShipsBuilt) {
-        return (
-            <div>
-                <div>Now you can play!</div>
-                <div>Your turn!</div>
-            </div>)
-    } else {
-        return (
-            <div>
-                <div>
-                    Click on {shipSizes[current]} {shipSizes[current] > 1 ? 'adjacent' : ''} square{shipSizes[current] > 1 ? 's' : ''} to
-                    build {currentShip}.
-                </div>
+    let shipPoints = props.value;
+    let currentShipName;
+    for (let shipName in shipPoints) {
+        if (shipPoints.hasOwnProperty(shipName)) {
+            if (shipPoints[shipName].length !== 0) {
+                currentShipName = shipName;
+            }
 
-                <div>
-                    Now you can build {availableShipsAmount > 0 ? availableShipsAmount : ''} ship{availableShipsAmount > 1 ? 's' : ''} of this type.
-                </div>
-            </div>
-        )
+            if (!currentShipName) {
+                return (
+                    <div>
+                        <div>Now you can play!</div>
+                        <div>Your turn!</div>
+                    </div>)
+            }
+        }
     }
+
+    let availableShipsAmount = shipPoints[currentShipName].length;
+    let shipNames = Object.keys(props.value);
+    let shipNumber = shipNames.indexOf(currentShipName);
+    let shipSizes = [1, 2, 3, 4];
+    let currentShipSize = shipSizes[shipNumber];
+
+    return (
+        <div>
+            <div>
+                Click on {currentShipSize} {currentShipSize > 1 ? 'adjacent' : ''} square{currentShipSize > 1 ? 's' : ''} to build {currentShipName}.
+            </div>
+
+            <div>
+                Now you can build {availableShipsAmount > 0 ? availableShipsAmount : ''} ship{availableShipsAmount > 1 ? 's' : ''} of this type.
+            </div>
+        </div>
+    );
 }

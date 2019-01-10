@@ -53,6 +53,8 @@ class App extends Component {
                 battleship: []
             },
             builtShipsCopy: {},
+            aliveShipsAmount: 10,
+
             currentShipForKill: [],
             alreadyShot: [],
             squaresForShot: Array.from(new Array(100).keys())
@@ -197,8 +199,6 @@ class App extends Component {
         if (this.state.playerTurn) {
             if (newEnemySquares[index] === 'boat') {
                 newEnemySquares[index] = 'killed';
-
-                let aliveShipsAmount = 10;
                 for (let kindOfShip in this.enemy.builtShips) {
                     if (this.enemy.builtShips.hasOwnProperty(kindOfShip)) {
                         let currentShipKindArr = this.enemy.builtShips[kindOfShip];
@@ -207,17 +207,17 @@ class App extends Component {
                                 if (elem === index) {
                                     let elemNumber = arr.indexOf(elem);
                                     arr.splice(elemNumber, 1);
+
+                                    if (arr.length < 1) {
+                                        let arrNumber = currentShipKindArr.indexOf(arr);
+                                        let halo = calculateHalo(this.enemy.builtShipsCopy[kindOfShip][arrNumber]);
+                                        halo.forEach(square => {
+                                            newEnemySquares[square] = 'miss';
+                                        });
+                                        this.enemy.aliveShipsAmount--;
+                                    }
                                 }
                             });
-
-                            if (arr.length < 1) {
-                                let arrNumber = currentShipKindArr.indexOf(arr);
-                                let halo = calculateHalo(this.enemy.builtShipsCopy[kindOfShip][arrNumber]);
-                                halo.forEach(square => {
-                                    newEnemySquares[square] = 'miss';
-                                });
-                                aliveShipsAmount--;
-                            }
                         });
                     }
                 }
@@ -226,7 +226,7 @@ class App extends Component {
                     enemySquares: newEnemySquares
                 });
 
-                if (!aliveShipsAmount) {
+                if (!this.enemy.aliveShipsAmount) {
                     this.setState({
                         winner: 'Player'
                     });
@@ -305,9 +305,7 @@ class App extends Component {
             <button onClick={this.startNewGame}>New Game</button>
             <PlayerBoard
                 squares={this.state.playerSquares}
-                freePoints={this.state.playerFreePoints}
-                build={this.buildPlayerShips}
-                winner={this.state.winner}/>
+                build={this.buildPlayerShips}/>
             <EnemyBoard
                 squares={this.state.enemySquares}
                 build={this.buildEnemyShips}
