@@ -1,0 +1,32 @@
+@media screen and (max-width: 4000px) {
+    .board {
+        margin: 0 35px;
+        border-collapse: collapse;
+    }
+
+    .board tr {
+        text-align: center;
+    }
+}
+
+@media screen and (max-width: 992px) {
+    .board {
+        margin: 10px 15px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .board {
+        margin: 10px 10px;
+    }
+}
+
+
+
+
+
+
+
+
+
+

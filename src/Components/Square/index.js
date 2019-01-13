@@ -22,7 +22,6 @@ export default class Square extends Component {
             <td
                 className={calculateClass(this.props.value, this.props.enemy)}
                 onClick={this.props.onClick}>
-                {this.props.number}
             </td>
         )
     }

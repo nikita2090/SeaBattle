@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import Square from '../Square';
+import Square from '../Square/index';
 import './styles.css';
 
 export default class Board extends Component {
@@ -31,13 +31,13 @@ export default class Board extends Component {
         let numHeaders = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         let letterHeaders = ['', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
         let letters = letterHeaders.map((letter, i) =>
-            <th className="letterHeader" key={letter}>{letter}</th>
+            <th key={letter}>{letter}</th>
         );
 
         let rows = this.divideToRows(this.props.squares);
         let table = rows.map((row, i) =>
-            <tr className="row" key={i}>
-                <th className="numHeader">{numHeaders[i]}</th>
+            <tr key={i}>
+                <th>{numHeaders[i]}</th>
                 {row}
             </tr>
         );

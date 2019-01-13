@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
+import 'bootstrap/dist/css/bootstrap.css';
 import './App.css';
-import PlayerBoard from './PlayerBoard';
-import EnemyBoard from './EnemyBoard';
-import Header from './Header';
+
+import PlayerBoard from './Components/PlayerBoard';
+import EnemyBoard from './Components/EnemyBoard';
+import Tooltip from "./Components/Tooltip";
 import {calculateAvailableValues, calculateHalo} from './functions';
-import Tooltip from "./Tooltip/index";
 
 class App extends Component {
     constructor(props) {
@@ -298,19 +299,38 @@ class App extends Component {
     render() {
         return (
             <>
-            <Header/>
-            <Tooltip
-                value={this.state.playerFreePoints}
-                winner={this.state.winner}/>
-            <button onClick={this.startNewGame}>New Game</button>
-            <PlayerBoard
-                squares={this.state.playerSquares}
-                build={this.buildPlayerShips}/>
-            <EnemyBoard
-                squares={this.state.enemySquares}
-                build={this.buildEnemyShips}
-                turn={this.letEnemyTurn}
-                forEnemyBoardClick={this.forEnemyBoardClick}/>
+            <header>
+                <div className="container">
+                    <div className="row justify-content-center">
+                        <h1 className="header col-xl-12">Sea Battle</h1>
+                    </div>
+                    <div className="row justify-content-center">
+                        <Tooltip
+                            value={this.state.playerFreePoints}
+                            winner={this.state.winner}/>
+                    </div>
+                </div>
+            </header>
+            <main>
+                <div className="container">
+                    <div className="row justify-content-center" >
+                        <PlayerBoard className="col"
+                            squares={this.state.playerSquares}
+                            build={this.buildPlayerShips}/>
+                        <EnemyBoard className="col"
+                            squares={this.state.enemySquares}
+                            build={this.buildEnemyShips}
+                            turn={this.letEnemyTurn}
+                            forEnemyBoardClick={this.forEnemyBoardClick}/>
+                    </div>
+                    <div className="row justify-content-center">
+                        <button className="button col-xl-6 col-sm-8 col-xxs-10"
+                            onClick={this.startNewGame}>
+                            Clean boards and start New Game
+                        </button>
+                    </div>
+                </div>
+            </main>
             </>
         )
     }

@@ -1,0 +1,37 @@
+@media screen and (max-width: 4000px) {
+    .tooltip {
+        margin-top: 15px;
+        margin-bottom: 25px;
+        font-size: 18px;
+        text-align: center;
+        position: static;
+        opacity: 1;
+        color: lightgoldenrodyellow;
+
+    }
+}
+
+@media screen and (max-width: 992px) {
+    .tooltip {
+        font-size: 17px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .tooltip {
+        margin-top: 6px;
+        margin-bottom: 8px;
+        font-size: 16px;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .tooltip {
+        margin-top: 4px;
+        margin-bottom: 6px;
+        font-size: 15px;
+    }
+}
+
+
+
