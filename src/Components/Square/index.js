@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import './styles.css';
 
 export default class Square extends Component {
@@ -26,3 +27,9 @@ export default class Square extends Component {
         )
     }
 }
+
+Square.propTypes = {
+    value: PropTypes.string.isRequired,
+    enemy: PropTypes.bool.isRequired,
+    onClick: PropTypes.func
+};

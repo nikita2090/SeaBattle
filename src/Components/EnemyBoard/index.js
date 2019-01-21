@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import Board from '../Board/index';
+import PropTypes from 'prop-types';
 
 const EnemyBd = addEnemyFunctional(Board);
 
@@ -16,7 +17,7 @@ function addEnemyFunctional(WrappedBoard) {
         }
 
         handleClick = (i) => {
-            this.props.forEnemyBoardClick(i);
+            this.props.handleEnemyBoardClick(i);
         };
 
         render(){
@@ -24,12 +25,19 @@ function addEnemyFunctional(WrappedBoard) {
                 <WrappedBoard
                     squares={this.props.squares}
                     onClick={(i) => this.handleClick(i)}
-                    {...this.props}
                     enemy={true}
+                    {...this.props}
                 />
             )
         }
     }
+
+    EnemyBoard.propTypes = {
+        squares: PropTypes.array.isRequired,
+        build: PropTypes.func,
+        turn: PropTypes.func,
+        handleEnemyBoardClick: PropTypes.func,
+    };
 
     return EnemyBoard;
 }

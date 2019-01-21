@@ -1,4 +1,4 @@
-export {calculateAvailableValues, calculateHalo, calculateAdjacentSquares};
+export {calculateAvailableValues, calculateHalo};
 
 function calculateAvailableValues(arrOfClickedElems) {
     let minVal = Math.min(...arrOfClickedElems);
@@ -50,17 +50,6 @@ function calculateHalo(arr) {
     return result;
 }
 
-function calculateAdjacentSquares(square) {
-    let result = [square - 10, square + 10];
-    if(!checkLeftBorder(square)){
-        result.push(square - 1);
-    }
-    if(!checkRightBorder(square)){
-        result.push(square + 1);
-    }
-    return filterElemsOutOfRange(result, 0, 100);
-}
-
 function checkLeftBorder(value) {
     let leftBorder = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90];
     return leftBorder.some((borderElem) => borderElem === value);
@@ -71,7 +60,7 @@ function checkRightBorder(value) {
     return rightBorder.some((borderElem) => borderElem === value);
 }
 
-function filterElemsOutOfRange(arr, min, max){
+function filterElemsOutOfRange(arr, min, max) {
     return arr.filter(elem => elem >= min && elem < max);
 }
 
