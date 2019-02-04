@@ -5,17 +5,18 @@ import './styles.css';
 
 export default class Board extends Component {
     renderSquare = (i) => {
+        let {squares, enemy, onClick} = this.props;
         return (
             <Square
                 key={i}
-                value={this.props.squares[i]}
-                enemy={this.props.enemy}
-                onClick={() => this.props.onClick(i)}
+                value={squares[i]}
+                enemy={enemy}
+                onClick={onClick.bind(this, i)}
             />
         )
     };
 
-    divideToRows(arr) {
+    divideToRows = (arr) => {
         let rows = [];
         for (let i = 0; i < 100; i += 10) {
             let arrRow = arr.slice(i, i + 10);
@@ -25,7 +26,7 @@ export default class Board extends Component {
             rows.push(row);
         }
         return rows;
-    }
+    };
 
     render() {
         let numHeaders = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];

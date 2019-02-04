@@ -17,14 +17,14 @@ function addEnemyFunctional(WrappedBoard) {
         }
 
         handleClick = (i) => {
-            this.props.handleEnemyBoardClick(i);
+            this.props.onClick(i);
         };
 
         render(){
             return (
                 <WrappedBoard
                     squares={this.props.squares}
-                    onClick={(i) => this.handleClick(i)}
+                    onClick={this.handleClick}
                     enemy={true}
                     {...this.props}
                 />

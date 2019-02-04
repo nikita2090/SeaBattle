@@ -3,26 +3,31 @@ import PropTypes from 'prop-types';
 import './styles.css';
 
 export default class Square extends Component {
-    render() {
-        function calculateClass(value, enemy) {
-            switch (value) {
-                case 'empty':
-                    return 'square';
-                case 'boat':
-                    if (enemy) return 'square';
-                    return 'square boat';
-                case 'killed':
-                    return 'square killed';
-                case 'miss':
-                    return 'square miss';
-                default:
-            }
-        }
+    shouldComponentUpdate(nextProps) {
+        return nextProps.value !== this.props.value
+    }
 
+    static calculateClass(value, enemy) {
+        switch (value) {
+            case 'empty':
+                return '';
+            case 'boat':
+                if (enemy) return '';
+                return 'boat';
+            case 'killed':
+                return 'killed';
+            case 'miss':
+                return 'miss';
+            default:
+        }
+    }
+
+    render() {
+        let {value, enemy, onClick} = this.props;
         return (
             <td
-                className={calculateClass(this.props.value, this.props.enemy)}
-                onClick={this.props.onClick}>
+                className={`square ${Square.calculateClass(value, enemy)}`}
+                onClick={onClick}>
             </td>
         )
     }
