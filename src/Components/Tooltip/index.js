@@ -5,6 +5,8 @@ import './styles.css'
 export default class Tooltip extends Component {
     render() {
         let {winner, playerFreePoints} = this.props;
+
+        //if winner is known, display him
         if (winner) {
             return (
                 <div className="tooltip ">
@@ -24,6 +26,7 @@ export default class Tooltip extends Component {
                     currentShipName = shipName;
                 }
 
+                //if player built all ships display this
                 if (!currentShipName) {
                     return (
                         <div className="tooltip green">
@@ -34,6 +37,7 @@ export default class Tooltip extends Component {
             }
         }
 
+        //display tooltip with type of ship, its squares and amount of available ships
         let availableShipsAmount = playerFreePoints[currentShipName].length;
         let shipNames = Object.keys(playerFreePoints);
         let shipNumber = shipNames.indexOf(currentShipName);

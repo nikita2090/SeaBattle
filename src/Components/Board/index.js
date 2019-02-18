@@ -46,8 +46,8 @@ export default class Board extends Component {
         return (
             <table className="board">
                 <tbody>
-                <tr>{letters}</tr>
-                {table}
+                    <tr>{letters}</tr>
+                    {table}
                 </tbody>
             </table>
         )

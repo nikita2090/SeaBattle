@@ -15,6 +15,7 @@ function addPlayerFunctional(WrappedBoard) {
         render() {
             return (
                 <WrappedBoard
+                    className="col"
                     squares={this.props.squares}
                     onClick={(i) => this.handleClick(i)}
                     enemy={false}

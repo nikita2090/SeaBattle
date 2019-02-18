@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
 
 import Row from './Row';
-import Container from "./Container";
-import Button from "./Button";
+import Container from './Container';
+import Button from './Button';
 import PlayerBoard from './PlayerBoard';
 import EnemyBoard from './EnemyBoard';
-import Tooltip from "./Tooltip";
+import Tooltip from './Tooltip';
 import {calculateAvailableValues, calculateHalo} from '../functions';
 
 class Main extends Component {
@@ -89,6 +89,7 @@ class Main extends Component {
         let {availableVals} = this.player;
         if (!availableVals) return;
 
+        //warn user if he deadlocked, clean borders and start new game
         if (availableVals.length === 0) {
             alert('Your ship building deadlocked. Your board will be cleaned!');
             this.startNewGame();
@@ -100,39 +101,42 @@ class Main extends Component {
     };
 
     buildEnemyShips = () => {
+        //repeat while we have free building points
         while (this.enemy.freePoints.vedette.length) {
             let {availableVals} = this.enemy;
-            let rand = Math.floor(Math.random() * availableVals.length);
-            let randomAvaliableValue = availableVals[rand];
+            let rand = Math.floor(Math.random() * availableVals.length); //random value from interval
+            let randomAvaliableSquare = availableVals[rand];
 
-            if (isNaN(randomAvaliableValue)) {
+            //rebuilding when enemy ships deadlocked and enemy building phase not finished
+            if (isNaN(randomAvaliableSquare)) {
                 this.startNewGame();
                 return;
             }
 
-            this.build(randomAvaliableValue, false);
+            this.build(randomAvaliableSquare, false);
         }
     };
 
     build = (index, playerFlag) => {
         let target, newSquares, newPoints;
+
         if (playerFlag) {
             target = this.player;
-            newSquares = this.state.playerSquares.slice();
-            newPoints = Object.assign({}, this.state.playerFreePoints);
+            newSquares = [...this.state.playerSquares];
+            newPoints = {...this.state.playerFreePoints};
         } else {
             target = this.enemy;
-            newSquares = this.enemy.squares.slice();
-            newPoints = Object.assign({}, this.enemy.freePoints);
+            newSquares = [...this.enemy.squares];
+            newPoints = {...this.enemy.freePoints};
         }
 
-        let currentShipBuildingPointsArr = newPoints[target.currentShip];
-        let points = currentShipBuildingPointsArr[currentShipBuildingPointsArr.length - 1];
+        let currentShipBuildingPointsArr = newPoints[target.currentShip];//arr of current ship type points
+        let points = currentShipBuildingPointsArr[currentShipBuildingPointsArr.length - 1];//current ship points
 
-        target.currentShipForBuild.push(index);
+        target.currentShipForBuild.push(index); //save part of building ship
 
         let availableVals = calculateAvailableValues(target.currentShipForBuild);
-        target.availableVals = availableVals.filter(elem => !target.reservedSquares.includes(elem));
+        target.availableVals = availableVals.filter(elem => !target.reservedSquares.includes(elem)); //exclude reserved squares
 
         newSquares[index] = 'boat';
 
@@ -144,15 +148,17 @@ class Main extends Component {
             this.enemy.squares = newSquares;
         }
 
-        points--;
+        points--; //decrease current ship points
         currentShipBuildingPointsArr.pop();
+
+        //if current ship built, calculate halo, save ship and its halo in reservedSquares
         if (points < 1) {
             let halo = calculateHalo(target.currentShipForBuild);
-            target.reservedSquares = target.reservedSquares.concat(target.currentShipForBuild, halo);
+            target.reservedSquares = [...target.reservedSquares, ...target.currentShipForBuild, ...halo]; //include halo in reserved squares
 
             let vedettsAmount;
             if (playerFlag) {
-                target.builtShips = target.builtShips.concat(target.currentShipForBuild);
+                target.builtShips = [...target.builtShips, ...target.currentShipForBuild];
                 vedettsAmount = this.state.playerFreePoints.vedette
             } else {
                 target.builtShips[target.currentShip].push(target.currentShipForBuild);
@@ -160,15 +166,16 @@ class Main extends Component {
                 vedettsAmount = this.enemy.freePoints.vedette
             }
 
+
             if (Math.max(...vedettsAmount) < 1) {
                 if (playerFlag) {
+                    //if player built all ships, let him play
                     this.player.availableVals = null;
                     this.setState({
                         playerTurn: true
                     });
                 } else {
-
-
+                    //if enemy built all ships, re-render enemy board
                     this.setState({
                         enemySquares: this.enemy.squares
                     });
@@ -178,13 +185,15 @@ class Main extends Component {
 
             target.currentShipForBuild = [];
             let newArr = Array.from(new Array(100).keys());
-            target.availableVals = newArr.filter(elem => !target.reservedSquares.includes(elem));
+            target.availableVals = newArr.filter(elem => !target.reservedSquares.includes(elem));// exclude reserved squares
 
+            //if points of current ship type are 0, change current type of ship
             if (currentShipBuildingPointsArr.length === 0) {
                 target.shipKey--;
                 target.currentShip = target.ships[target.shipKey];
             }
         } else {
+            //update current ship points amount
             currentShipBuildingPointsArr.push(points);
             if (playerFlag) {
                 this.setState({
@@ -203,6 +212,9 @@ class Main extends Component {
         if (playerTurn) {
             if (newEnemySquares[index] === 'boat') {
                 newEnemySquares[index] = 'killed';
+
+                //search for killed square
+                //and delete it from array of builtShips
                 let {builtShips} = this.enemy;
                 for (let kindOfShip in builtShips) {
                     if (builtShips.hasOwnProperty(kindOfShip)) {
@@ -213,6 +225,8 @@ class Main extends Component {
                                     let elemNumber = arr.indexOf(elem);
                                     arr.splice(elemNumber, 1);
 
+                                    //if all part of ship killed, calculate and display halo
+                                    // and then decrease alive ships amount
                                     if (arr.length < 1) {
                                         let arrNumber = currentShipKindArr.indexOf(arr);
                                         let {builtShipsCopy} = this.enemy;
@@ -232,6 +246,7 @@ class Main extends Component {
                     enemySquares: newEnemySquares
                 });
 
+                //if all enemy ships killed set winner
                 if (!this.enemy.aliveShipsAmount) {
                     this.setState({
                         winner: 'Player'
@@ -254,14 +269,18 @@ class Main extends Component {
         let candidatesForKill, isShipKilled;
         while (!winner && playerTurn === false) {
             let {squaresForShot, currentShipForKill, alreadyShot} = this.enemy;
-            let rand = Math.floor(Math.random() * squaresForShot.length);
+            let rand = Math.floor(Math.random() * squaresForShot.length); //random number from interval
             let randomSquareForShot = squaresForShot[rand];
 
             if (newSquares[randomSquareForShot] === 'boat') {
                 newSquares[randomSquareForShot] = 'killed';
                 let {builtShips} = this.player;
+
+                //delete killed square from array of builtShips
                 let elemNumber = builtShips.indexOf(newSquares[randomSquareForShot]);
                 builtShips.splice(elemNumber, 1);
+
+                //if all player ships are killed, set winner
                 if (builtShips.length < 1) {
                     winner = 'Enemy';
                     this.setState({
@@ -275,18 +294,22 @@ class Main extends Component {
                 isShipKilled = !candidatesForKill.some(square => newSquares[square] === 'boat');
                 alreadyShot.push(randomSquareForShot);
 
+                //if current ship killed, display its halo
+                //next shot will be random
                 if (isShipKilled) {
                     let halo = calculateHalo(currentShipForKill);
-                    alreadyShot = alreadyShot.concat(halo);
+                    alreadyShot = [...alreadyShot, ...halo];
                     halo.forEach(square => {
                         newSquares[square] = 'miss';
                     });
                     squaresForShot = Array.from(new Array(100).keys());
                     currentShipForKill = [];
                 } else {
+                    //next shot will be to some of near squares
                     squaresForShot = candidatesForKill;
                 }
             } else if (newSquares[randomSquareForShot] === 'empty') {
+                //save this miss and highlight it on the board
                 alreadyShot.push(randomSquareForShot);
                 if (currentShipForKill.length < 1) {
                     squaresForShot = Array.from(new Array(100).keys());
@@ -318,15 +341,15 @@ class Main extends Component {
                         </Row>
 
                         <Row>
-                            <PlayerBoard className="col"
-                                         squares={playerSquares}
-                                         onClick={this.buildPlayerShips}/>
+                            <PlayerBoard
+                                squares={playerSquares}
+                                onClick={this.buildPlayerShips}/>
 
-                            <EnemyBoard className="col"
-                                        squares={enemySquares}
-                                        build={this.buildEnemyShips}
-                                        turn={this.letEnemyTurn}
-                                        onClick={this.handleEnemyBoardClick}/>
+                            <EnemyBoard
+                                squares={enemySquares}
+                                build={this.buildEnemyShips}
+                                turn={this.letEnemyTurn}
+                                onClick={this.handleEnemyBoardClick}/>
                         </Row>
 
                         <Row>

@@ -23,6 +23,7 @@ function addEnemyFunctional(WrappedBoard) {
         render(){
             return (
                 <WrappedBoard
+                    className="col"
                     squares={this.props.squares}
                     onClick={this.handleClick}
                     enemy={true}

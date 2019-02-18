@@ -3,10 +3,10 @@ import 'bootstrap/dist/css/bootstrap.css';
 import './App.css';
 
 import Main from './Components/Main';
-import Header from "./Components/Header";
+import Header from './Components/Header';
 
 
-const App = ()=> (
+const App = () => (
     <>
         <Header heading="Sea Battle"/>
         <Main/>
