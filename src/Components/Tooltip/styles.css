@@ -2,12 +2,15 @@
     .tooltip {
         margin-top: 15px;
         margin-bottom: 25px;
+        position: static;
+
         font-size: 18px;
         text-align: center;
-        position: static;
         opacity: 1;
         color: lightgoldenrodyellow;
-
+    }
+    .tooltip p{
+        margin:0;
     }
 }
 
@@ -21,6 +24,7 @@
     .tooltip {
         margin-top: 6px;
         margin-bottom: 8px;
+
         font-size: 16px;
     }
 }
@@ -29,6 +33,7 @@
     .tooltip {
         margin-top: 4px;
         margin-bottom: 6px;
+
         font-size: 15px;
     }
 }

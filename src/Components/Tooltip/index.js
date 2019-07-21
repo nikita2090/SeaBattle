@@ -46,13 +46,13 @@ export default class Tooltip extends Component {
 
         return (
             <div className="tooltip orange">
-                <div>
+                <p>
                     Click on {currentShipSize} {currentShipSize > 1 ? 'adjacent' : ''} square{currentShipSize > 1 ? 's' : ''} to build {currentShipName}.
-                </div>
+                </p>
 
-                <div>
+                <p>
                     Now you can build {availableShipsAmount > 0 ? availableShipsAmount : ''} ship{availableShipsAmount > 1 ? 's' : ''} of this type.
-                </div>
+                </p>
             </div>
         );
     }
